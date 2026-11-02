@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Нерегулярна братва 🤝</title>
+<style>
+:root{
+  --bg:#f3f3f1; --card:#fff; --text:#111; --muted:#8a8a8e; --line:#ececea; --ink:#111;
+  --accent:#ff4b55; --accent-soft:rgba(255,75,85,.13); --green:#30a14e; --red:#e5372b;
+  --radius:24px; --shadow:0 1px 0 rgba(0,0,0,.03);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);
+  font:17px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+#app{max-width:720px;margin:0 auto;padding:20px 16px 110px}
+h1{font-size:36px;font-weight:800;letter-spacing:-.03em;line-height:1.1;margin:8px 0 6px}
+h2{font-size:22px;margin:0 0 8px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 16px;font-size:15px}
+button{font:inherit;cursor:pointer;border:0;border-radius:999px;padding:12px 22px;background:var(--ink);color:#fff;font-weight:700}
+button:active{transform:scale(.98)}
+button.ghost{background:#e6e6e3;color:var(--ink)}
+button.plain{background:transparent;color:var(--ink);padding:8px 10px;font-weight:600}
+button.danger{background:rgba(229,55,43,.1);color:var(--red)}
+button:disabled{opacity:.4;cursor:default}
+input[type=text],input[type=date],input[type=number],input.blank{font:inherit;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 12px;color:var(--text);outline:none}
+input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.search{width:100%;margin-bottom:12px;padding:14px 18px;border-radius:999px;background:#e6e6e3;border-color:transparent}
+.toolbar{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.toolbar .spacer{flex:1}
+.count{color:var(--muted);font-size:14px}
+.list{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid var(--line);cursor:pointer}
+.row:first-child{border-top:0}
+.row input[type=checkbox]{position:absolute;opacity:0;pointer-events:none}
+.tick{flex:none;width:24px;height:24px;border-radius:50%;border:2px solid #c7c7cc;display:grid;place-items:center;transition:.15s}
+input:checked + .tick{background:var(--ink);border-color:var(--ink)}
+input:checked + .tick::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.rowtext{flex:1;min-width:0;display:flex;flex-direction:column}
+.rowmain{font-weight:600}
+.rowforms{color:var(--muted);font-size:14px}
+.rowuk{color:var(--text);font-size:14px;text-align:right;max-width:40%}
+mark.v{background:var(--accent-soft);color:var(--accent);font-weight:800;border-radius:6px;padding:0 2px}
+.selbar{position:fixed;left:0;right:0;bottom:calc(92px + env(safe-area-inset-bottom));display:flex;justify-content:center;pointer-events:none}
+.selbar > div{pointer-events:auto;background:#fff;border-radius:999px;box-shadow:0 8px 28px rgba(0,0,0,.18);padding:10px 12px 10px 18px;display:flex;align-items:center;gap:14px;border:1px solid var(--line)}
+#tabbar{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));display:flex;justify-content:center;pointer-events:none}
+#tabbar .tabs{display:flex;width:100%;max-width:420px;background:var(--ink);border-radius:32px;padding:6px;pointer-events:auto;box-shadow:0 8px 28px rgba(0,0,0,.25)}
+#tabbar button{flex:1;background:none;color:rgba(255,255,255,.55);border-radius:26px;padding:8px 4px 9px;font-size:12px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px}
+#tabbar button.on{color:#fff;background:rgba(255,255,255,.14)}
+#tabbar .ico{font-size:22px;line-height:1}
+.badge{background:var(--red);color:#fff;border-radius:10px;font-size:11px;padding:0 6px;margin-left:4px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+.day h3{margin:0;font-size:17px;text-transform:capitalize}
+.day .head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.day .head .spacer{flex:1}
+.tag{font-size:12px;padding:3px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:700}
+.tag.late{background:rgba(229,55,43,.1);color:var(--red)}
+.wrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.wrow .w{flex:1;min-width:0}
+.wrow .w b{font-weight:600}
+.wrow .w small{display:block;color:var(--muted)}
+.wrow input[type=date]{padding:6px 8px;font-size:15px}
+.empty{text-align:center;color:var(--muted);padding:48px 16px}
+.ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.ctl label{color:var(--muted);font-size:14px}
+.ctl input[type=number]{width:70px}
+/* session */
+.sesshead{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.sesshead .title{flex:1;font-weight:700}
+.progress{height:8px;background:#e1e1de;border-radius:3px;overflow:hidden;margin-bottom:20px}
+.progress > i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width .3s}
+.flip{perspective:1200px;cursor:pointer;margin-bottom:16px}
+.flip-inner{display:grid;transition:transform .5s;transform-style:preserve-3d}
+.flip.flipped .flip-inner{transform:rotateY(180deg)}
+.face{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--card);border-radius:32px;box-shadow:var(--shadow);min-height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;gap:6px}
+.face.back{transform:rotateY(180deg)}
+.face.front{background:var(--ink);color:#fff}
+.face.front .uk{color:rgba(255,255,255,.62)}
+.face.front .hint{color:var(--accent)}
+.big{font-size:44px;font-weight:700;letter-spacing:-.02em}
+.mid{font-size:30px;font-weight:600}
+.uk{font-size:20px;color:var(--muted)}
+.hint{color:var(--muted);font-size:14px;margin-top:18px}
+.forms{display:flex;flex-direction:column;gap:12px;margin-top:14px;width:100%}
+.form-line small{display:block;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.form-line div{font-size:30px;font-weight:600}
+.grades{display:flex;gap:10px}
+.grades button{flex:1;padding:14px}
+.grades .again{background:rgba(229,55,43,.12);color:var(--red)}
+.grades .good{background:#e6e6e3;color:var(--ink)}
+.grades .easy{background:rgba(48,161,78,.14);color:var(--green)}
+.opts{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.opt{background:#fff;color:var(--text);border:2px solid transparent;border-radius:20px;text-align:left;font-weight:600;padding:16px 18px;font-size:18px}
+.opt.ok{background:rgba(48,161,78,.14);border-color:var(--green);color:var(--green)}
+.opt.bad{background:rgba(229,55,43,.1);border-color:var(--red);color:var(--red)}
+.qcard{background:var(--card);border-radius:32px;box-shadow:var(--shadow);padding:24px;text-align:center}
+.blankline{font-size:30px;font-weight:600;margin:6px 0 14px;display:flex;flex-wrap:wrap;gap:2px;align-items:center;justify-content:center}
+input.blank{width:2.6ch;min-width:2.6ch;text-align:center;padding:2px 4px;font-size:26px;font-weight:700;margin:0 2px;border-color:var(--accent);color:var(--accent)}
+input.blank.ok,input.t.ok{border-color:var(--green);background:rgba(48,161,78,.1)}
+input.blank.bad,input.t.bad{border-color:var(--red);background:rgba(229,55,43,.08)}
+.fields{display:flex;flex-direction:column;gap:12px;text-align:left;margin:16px 0}
+.fields label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px}
+.fields input{width:100%;font-size:20px;padding:12px 14px}
+.answer{color:var(--green);font-size:15px;margin-top:4px}
+.keys{display:flex;gap:6px;margin-bottom:12px}
+.keys button{padding:6px 14px;background:#e6e6e3;color:var(--text);font-weight:600}
+.feedback{min-height:24px;margin:10px 0;font-weight:600}
+.feedback.ok{color:var(--green)} .feedback.bad{color:var(--red)}
+.wide{width:100%;padding:17px;font-size:18px}
+.done{text-align:center;padding:60px 16px}
+.done .emoji{font-size:64px}
+@media (max-width:480px){
+  h1{font-size:30px}.big{font-size:38px}.rowuk{max-width:36%}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<nav id="tabbar"></nav>
+
+<script>
+(() => {
+'use strict';
+
+/* ---------- data: inf, Präteritum, auxiliary, Partizip II, Ukrainian ("/" separates variants) ---------- */
+const ROWS = [
+["backen","buk","hat","gebacken","пекти"],
+["befehlen","befahl","hat","befohlen","наказувати"],
+["beginnen","begann","hat","begonnen","починати"],
+["beißen","biss","hat","gebissen","кусати"],
+["bergen","barg","hat","geborgen","рятувати, ховати"],
+["bersten","barst","ist","geborsten","тріскатися, лопатися"],
+["bewegen","bewog","hat","bewogen","спонукати"],
+["biegen","bog","hat","gebogen","гнути"],
+["bieten","bot","hat","geboten","пропонувати"],
+["binden","band","hat","gebunden","в'язати, зв'язувати"],
+["bitten","bat","hat","gebeten","просити"],
+["blasen","blies","hat","geblasen","дути"],
+["bleiben","blieb","ist","geblieben","залишатися"],
+["braten","briet","hat","gebraten","смажити"],
+["brechen","brach","hat/ist","gebrochen","ламати"],
+["brennen","brannte","hat","gebrannt","горіти, палити"],
+["bringen","brachte","hat","gebracht","приносити"],
+["denken","dachte","hat","gedacht","думати"],
+["dingen","dingte","hat","gedungen","наймати"],
+["dreschen","drosch","hat","gedroschen","молотити"],
+["dringen","drang","hat/ist","gedrungen","проникати"],
+["dürfen","durfte","hat","gedurft","мати право, сміти"],
+["empfehlen","empfahl","hat","empfohlen","рекомендувати"],
+["erbleichen","erbleichte","ist","erbleicht","блідніти"],
+["erlöschen","erlosch","ist","erloschen","згасати, гаснути"],
+["erschrecken","erschrak","ist","erschrocken","злякатися, перелякатися"],
+["essen","aß","hat","gegessen","їсти"],
+["fahren","fuhr","hat/ist","gefahren","їхати, везти"],
+["fallen","fiel","ist","gefallen","падати"],
+["fangen","fing","hat","gefangen","ловити"],
+["fechten","focht","hat","gefochten","фехтувати, битися"],
+["finden","fand","hat","gefunden","знаходити"],
+["flechten","flocht","hat","geflochten","плести"],
+["fliegen","flog","hat/ist","geflogen","літати"],
+["fliehen","floh","ist","geflohen","тікати, рятуватися втечею"],
+["fließen","floss","ist","geflossen","текти, литися"],
+["fressen","fraß","hat","gefressen","жерти"],
+["frieren","fror","hat","gefroren","мерзнути"],
+["gären","gor","ist","gegoren","бродити"],
+["gebären","gebar","hat/ist","geboren","народжувати"],
+["geben","gab","hat","gegeben","давати"],
+["gedeihen","gedieh","ist","gediehen","процвітати, добре рости"],
+["gehen","ging","ist","gegangen","іти, ходити"],
+["gelingen","gelang","ist","gelungen","вдаватися"],
+["gelten","galt","hat","gegolten","мати значення, стосуватися, бути чинним"],
+["genesen","genas","ist","genesen","одужувати"],
+["genießen","genoss","hat","genossen","насолоджуватися"],
+["geschehen","geschah","ist","geschehen","траплятися"],
+["gewinnen","gewann","hat","gewonnen","вигравати, здобувати"],
+["gießen","goss","hat","gegossen","лити, наливати"],
+["gleiten","glitt","ist","geglitten","ковзати"],
+["glimmen","glimmte","hat","geglimmt","тліти"],
+["graben","grub","hat","gegraben","копати"],
+["greifen","griff","hat","gegriffen","хапати"],
+["haben","hatte","hat","gehabt","мати"],
+["halten","hielt","hat","gehalten","тримати"],
+["hängen","hing","hat","gehangen","висіти"],
+["hauen","haute/hieb","hat/ist","gehauen","рубати, бити"],
+["heben","hob","hat","gehoben","піднімати"],
+["heißen","hieß","hat","geheißen","називатися"],
+["helfen","half","hat","geholfen","допомагати"],
+["kennen","kannte","hat","gekannt","знати (бути знайомим)"],
+["klimmen","klomm","ist","geklommen","дертися"],
+["klingen","klang","hat","geklungen","дзвеніти"],
+["kneifen","kniff","hat","gekniffen","щипати"],
+["kommen","kam","ist","gekommen","приходити"],
+["können","konnte","hat","gekonnt","могти, вміти"],
+["kriechen","kroch","ist","gekrochen","повзти"],
+["laden","lud","hat","geladen","вантажити, запрошувати"],
+["lassen","ließ","hat","gelassen","залишати, веліти"],
+["laufen","lief","ist","gelaufen","бігти"],
+["leiden","litt","hat","gelitten","страждати, терпіти"],
+["leihen","lieh","hat","geliehen","позичати"],
+["lesen","las","hat","gelesen","читати"],
+["liegen","lag","hat","gelegen","лежати"],
+["löschen","losch","hat","geloschen","гасити, стирати"],
+["lügen","log","hat","gelogen","брехати"],
+["mahlen","mahlte","hat","gemahlen","молоти"],
+["meiden","mied","hat","gemieden","уникати"],
+["melken","melkte/molk","hat","gemolken/gemelkt","доїти"],
+["messen","maß","hat","gemessen","міряти"],
+["misslingen","misslang","ist","misslungen","не вдаватися"],
+["mögen","mochte","hat","gemocht","любити, подобатися"],
+["müssen","musste","hat","gemusst","мусити"],
+["nehmen","nahm","hat","genommen","брати"],
+["nennen","nannte","hat","genannt","називати"],
+["pfeifen","pfiff","hat","gepfiffen","свистіти"],
+["pflegen","pflog","hat","gepflogen","доглядати, мати звичку"],
+["preisen","pries","hat","gepriesen","вихваляти"],
+["quellen","quoll","ist","gequollen","бити джерелом"],
+["raten","riet","hat","geraten","радити"],
+["reiben","rieb","hat","gerieben","терти"],
+["reißen","riss","hat/ist","gerissen","рвати"],
+["reiten","ritt","hat/ist","geritten","їздити верхи"],
+["rennen","rannte","ist","gerannt","мчати, бігти стрімголов"],
+["riechen","roch","hat","gerochen","нюхати, пахнути"],
+["ringen","rang","hat","gerungen","боротися, викручувати"],
+["rinnen","rann","ist","geronnen","сочитися, струменіти"],
+["rufen","rief","hat","gerufen","кликати, гукати"],
+["salzen","salzte","hat","gesalzen/gesalzt","солити"],
+["saufen","soff","hat","gesoffen","пити (про тварин), пиячити"],
+["saugen","sog/saugte","hat","gesogen/gesaugt","смоктати"],
+["schaffen","schuf","hat","geschaffen","створювати, творити"],
+["schallen","schallte","hat","geschallt","звучати, лунати"],
+["scheiden","schied","hat/ist","geschieden","розділяти, розлучатися"],
+["scheinen","schien","hat","geschienen","світити, сяяти"],
+["schelten","schalt","hat","gescholten","лаяти"],
+["scheren","schor","hat","geschoren","стригти (тварин)"],
+["schieben","schob","hat","geschoben","рухати, пересувати"],
+["schießen","schoss","hat","geschossen","стріляти"],
+["schinden","schund","hat","geschunden","здирати шкуру"],
+["schlafen","schlief","hat","geschlafen","спати"],
+["schlagen","schlug","hat","geschlagen","бити, ударяти"],
+["schleichen","schlich","ist","geschlichen","підкрадатися"],
+["schleifen","schliff","hat","geschliffen","точити"],
+["schleißen","schliss","hat","geschlissen","розколювати"],
+["schließen","schloss","hat","geschlossen","зачиняти"],
+["schlingen","schlang","hat","geschlungen","обплітати, жадібно ковтати"],
+["schmeißen","schmiss","hat","geschmissen","шпурляти"],
+["schmelzen","schmolz","hat/ist","geschmolzen","танути"],
+["schnauben","schnob","hat","geschnoben","сопти"],
+["schneiden","schnitt","hat","geschnitten","різати"],
+["schrecken","schrak","ist","geschrocken","здригатися від страху"],
+["schreiben","schrieb","hat","geschrieben","писати"],
+["schreien","schrie","hat","geschrien","кричати"],
+["schreiten","schritt","ist","geschritten","крокувати"],
+["schweigen","schwieg","hat","geschwiegen","мовчати"],
+["schwellen","schwoll","ist","geschwollen","пухнути"],
+["schwimmen","schwamm","ist","geschwommen","плавати"],
+["schwinden","schwand","ist","geschwunden","зменшуватися, зникати"],
+["schwingen","schwang","hat","geschwungen","махати, розмахувати"],
+["schwören","schwor/schwur","hat","geschworen","клястися"],
+["sehen","sah","hat","gesehen","бачити"],
+["sein","war","ist","gewesen","бути"],
+["senden","sandte","hat","gesandt","надсилати, відправляти"],
+["sieden","sott","hat","gesotten","кипіти, варити"],
+["singen","sang","hat","gesungen","співати"],
+["sinken","sank","ist","gesunken","опускатися, занурюватися"],
+["sinnen","sann","hat","gesonnen","міркувати, роздумувати"],
+["sitzen","saß","hat","gesessen","сидіти"],
+["sollen","sollte","hat","gesollt","мати (повинен)"],
+["speien","spie","hat","gespien","плювати, виблювати"],
+["spinnen","spann","hat","gesponnen","прясти"],
+["sprechen","sprach","hat","gesprochen","говорити"],
+["sprießen","spross","ist","gesprossen","пускати паростки, сходити"],
+["springen","sprang","ist","gesprungen","стрибати, скакати"],
+["stechen","stach","hat","gestochen","колоти"],
+["stecken","stak","hat","gesteckt","стирчати"],
+["stehen","stand","hat","gestanden","стояти, знаходитися"],
+["stehlen","stahl","hat","gestohlen","красти"],
+["steigen","stieg","ist","gestiegen","підніматися"],
+["sterben","starb","ist","gestorben","помирати"],
+["stieben","stob","ist","gestoben","розсіюватися"],
+["stinken","stank","hat","gestunken","смердіти"],
+["stoßen","stieß","hat/ist","gestoßen","штовхати"],
+["streichen","strich","hat","gestrichen","викреслювати"],
+["streiten","stritt","hat","gestritten","сперечатися"],
+["tragen","trug","hat","getragen","носити"],
+["treffen","traf","hat","getroffen","зустрічати"],
+["treiben","trieb","hat/ist","getrieben","гнати"],
+["treten","trat","hat/ist","getreten","ступати"],
+["triefen","triefte/trof","hat","getrieft/getrofen","капати"],
+["trinken","trank","hat","getrunken","пити"],
+["trügen","trog","hat","getrogen","обманювати"],
+["tun","tat","hat","getan","робити"],
+["verderben","verdarb","hat/ist","verdorben","псувати"],
+["verdrießen","verdross","hat","verdrossen","сердити, дошкуляти"],
+["vergessen","vergaß","hat","vergessen","забувати"],
+["verlieren","verlor","hat","verloren","втрачати"],
+["verzeihen","verzieh","hat","verziehen","вибачати"],
+["wachsen","wuchs","ist","gewachsen","рости"],
+["wägen","wog","hat","gewogen","зважувати (обдумувати)"],
+["waschen","wusch","hat","gewaschen","мити"],
+["weben","wob","hat","gewoben","ткати"],
+["weisen","wies","hat","gewiesen","вказувати"],
+["wenden","wandte","hat","gewandt","повертати"],
+["werben","warb","hat","geworben","вербувати"],
+["werden","wurde","ist","geworden","ставати"],
+["werfen","warf","hat","geworfen","кидати"],
+["wiegen","wog","hat","gewogen","зважувати (важити)"],
+["winden","wand","hat","gewunden","обвивати, крутити"],
+["wissen","wusste","hat","gewusst","знати (факти)"],
+["wollen","wollte","hat","gewollt","хотіти"],
+["ziehen","zog","hat/ist","gezogen","тягти"],
+["zwingen","zwang","hat","gezwungen","примушувати"]
+];
+
+const VERBS = ROWS.map(([inf, pret, aux, ptz, uk]) => ({
+  inf, uk, pret: pret.split('/'), aux: aux.split('/'), ptz: ptz.split('/'),
+})).sort((a, b) => a.inf.localeCompare(b.inf, 'de'));
+const BY_INF = new Map(VERBS.map(v => [v.inf, v]));
+
+/* ---------- vowel-change analysis ---------- */
+const VOWEL_RUN = /qu|[aeiouäöü]+/g; // "qu" is matched first so its u is not counted as a vowel
+const isVowel = ch => 'aeiouäöü'.includes(ch);
+
+// Vowel runs between `from` and `to`; the word is cut at `to` first so a trailing ending ("-en") can't merge into a run.
+function vowelRuns(word, from, to) {
+  return [...word.slice(0, to).matchAll(VOWEL_RUN)]
+    .filter(m => m[0] !== 'qu' && m.index >= from)
+    .map(m => ({ text: m[0], start: m.index, end: m.index + m[0].length }));
+}
+
+function stemOf(inf) {
+  const end = inf.endsWith('en') ? inf.length - 2 : inf.length - 1;
+  return vowelRuns(inf, 0, end);
+}
+
+function pretEnd(form) {
+  if (form.endsWith('te')) return form.length - 2;
+  if (form.endsWith('e') && !isVowel(form[form.length - 2])) return form.length - 1;
+  return form.length;
+}
+
+function ptzEnd(form) {
+  if (form.endsWith('ien')) return form.length - 1;
+  if (form.endsWith('en')) return form.length - 2;
+  if (form.endsWith('t') || form.endsWith('n')) return form.length - 1;
+  return form.length;
+}
+
+// Runs of the form that sit where the stem vowels sit, and which of them differ from the infinitive.
+function compareWithStem(form, isParticiple, stemRuns) {
+  const end = isParticiple ? ptzEnd(form) : pretEnd(form);
+  let runs = vowelRuns(form, 0, end);
+  if (isParticiple && form.startsWith('ge')) {
+    const withoutPrefix = vowelRuns(form, 2, end);
+    if (withoutPrefix.length === stemRuns.length) runs = withoutPrefix;
+  }
+  const changed = [];
+  runs.forEach((run, i) => { if (!stemRuns[i] || stemRuns[i].text !== run.text) changed.push(i); });
+  return { text: form, runs, changed, ranges: changed.map(i => runs[i]) };
+}
+
+function analyse(verb) {
+  if (verb.analysis) return verb.analysis;
+  const stemRuns = stemOf(verb.inf);
+  const pret = verb.pret.map(f => compareWithStem(f, false, stemRuns));
+  const ptz = verb.ptz.map(f => compareWithStem(f, true, stemRuns));
+  const changedStemIdx = new Set([...pret, ...ptz].flatMap(f => f.changed));
+  const inf = [...changedStemIdx].filter(i => stemRuns[i]).map(i => stemRuns[i]);
+  // The form shown in exercises: the variant whose vowel actually changes (e.g. molk, not melkte).
+  const primary = forms => forms.find(f => f.ranges.length) || forms[0];
+  verb.analysis = { pret, ptz, inf, primaryPret: primary(pret), primaryPtz: primary(ptz) };
+  return verb.analysis;
+}
+
+/* ---------- small helpers ---------- */
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const shuffle = arr => { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const normalise = s => s.toLowerCase().trim().replace(/\s+/g, ' ').replace(/ß/g, 'ss').replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue');
+
+function highlight(word, ranges) {
+  const sorted = [...ranges].sort((a, b) => a.start - b.start);
+  let html = '', pos = 0;
+  for (const r of sorted) {
+    html += esc(word.slice(pos, r.start)) + '<mark class="v">' + esc(word.slice(r.start, r.end)) + '</mark>';
+    pos = r.end;
+  }
+  return html + esc(word.slice(pos));
+}
+const auxLabel = v => v.aux.join('/');
+const pretHtml = v => analyse(v).pret.map(f => highlight(f.text, f.ranges)).join(' / ');
+const ptzHtml = v => esc(auxLabel(v)) + ' ' + analyse(v).ptz.map(f => highlight(f.text, f.ranges)).join(' / ');
+const infHtml = v => highlight(v.inf, analyse(v).inf);
+const pretPlain = v => v.pret.join(' / ');
+const ptzPlain = v => auxLabel(v) + ' ' + v.ptz.join(' / ');
+
+/* ---------- dates ---------- */
+const pad = n => String(n).padStart(2, '0');
+const toISO = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const todayISO = () => toISO(new Date());
+const parseISO = iso => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d); };
+const addDays = (iso, n) => { const d = parseISO(iso); d.setDate(d.getDate() + n); return toISO(d); };
+const formatDate = iso => parseISO(iso).toLocaleDateString('uk-UA', { weekday: 'long', day: 'numeric', month: 'long' });
+
+/* ---------- persistence ---------- */
+const STORAGE_KEY = 'irregular-verbs-v1';
+function loadState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (saved) {
+      const schedule = {};
+      for (const [inf, date] of Object.entries(saved.schedule || {})) if (BY_INF.has(inf)) schedule[inf] = date;
+      return { selected: new Set((saved.selected || []).filter(i => BY_INF.has(i))), schedule };
+    }
+  } catch (e) { /* storage unavailable: fall through to empty state */ }
+  return { selected: new Set(), schedule: {} };
+}
+let state = loadState();
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ selected: [...state.selected], schedule: state.schedule })); } catch (e) { /* ignore */ }
+}
+
+/* ---------- app shell ---------- */
+const app = document.getElementById('app');
+const tabbar = document.getElementById('tabbar');
+let view = 'main';          // main | overview | session | done
+let tab = 'words';          // words | plan | today
+let search = '';
+let draft = {};             // overview: inf -> ISO date or ''
+let session = null;
+
+const dueWords = () => Object.entries(state.schedule).filter(([, d]) => d <= todayISO())
+  .sort((a, b) => a[1].localeCompare(b[1]) || a[0].localeCompare(b[0], 'de')).map(([inf]) => BY_INF.get(inf));
+
+function render() {
+  if (view === 'session') { renderSessionShell(); return; }
+  tabbar.style.display = view === 'main' ? '' : 'none';
+  if (view === 'overview') renderOverview();
+  else if (view === 'done') renderDone();
+  else renderMain();
+  window.scrollTo(0, 0);
+}
+
+function renderTabbar() {
+  const late = dueWords().length;
+  const tabs = [['words', '📚', 'Слова'], ['plan', '🗓️', 'План'], ['today', '⭐', 'Сьогодні']];
+  tabbar.innerHTML = '<div class="tabs">' + tabs.map(([id, ico, label]) =>
+    `<button data-action="tab" data-tab="${id}" class="${tab === id ? 'on' : ''}"><span class="ico">${ico}</span><span>${label}${id === 'today' && late ? `<span class="badge">${late}</span>` : ''}</span></button>`).join('') + '</div>';
+}
+
+function renderMain() {
+  renderTabbar();
+  if (tab === 'words') renderWordsTab();
+  else if (tab === 'plan') renderPlanTab();
+  else renderTodayTab();
+}
+
+/* ---------- Words tab ---------- */
+function filteredVerbs() {
+  const q = search.trim().toLowerCase();
+  if (!q) return VERBS;
+  return VERBS.filter(v => [v.inf, ...v.pret, ...v.ptz, v.uk].some(s => s.toLowerCase().includes(q)));
+}
+
+function wordRow(v) {
+  return `<label class="row"><input type="checkbox" class="wordcheck" data-inf="${esc(v.inf)}" ${state.selected.has(v.inf) ? 'checked' : ''}><span class="tick"></span>
+    <span class="rowtext"><span class="rowmain">${infHtml(v)}</span><span class="rowforms">${pretHtml(v)} · ${ptzHtml(v)}</span></span>
+    <span class="rowuk">${esc(v.uk)}</span></label>`;
+}
+
+function renderWordList() {
+  const list = filteredVerbs();
+  document.getElementById('wordList').innerHTML = list.length ? list.map(wordRow).join('') : '<div class="empty">Тут порожньо 🤷 Спробуй інше слово</div>';
+  document.getElementById('shownCount').textContent = `Знайшов: ${list.length} з ${VERBS.length}`;
+}
+
+function updateSelectionBar() {
+  const n = state.selected.size;
+  const bar = document.getElementById('selbar');
+  bar.style.display = n ? '' : 'none';
+  document.getElementById('selCount').textContent = `Вибрано: ${n} 🔥`;
+}
+
+function renderWordsTab() {
+  app.innerHTML = `<h1>Нерегулярна братва 🤝</h1><p class="sub">Познач тих, кого хочеш приборкати, тисни «Далі» — і розкладемо все по днях.</p>
+    <input class="search" type="text" id="search" placeholder="Шукай німецькою чи українською…" value="${esc(search)}" autocomplete="off">
+    <div class="toolbar"><button class="ghost" data-action="select-all">Усі до купи</button><button class="ghost" data-action="select-none">Скинути вибір</button><span class="spacer"></span><span class="count" id="shownCount"></span></div>
+    <div class="list" id="wordList"></div>
+    <div class="selbar" id="selbar"><div><span id="selCount"></span><button data-action="open-overview">Далі →</button></div></div>`;
+  renderWordList();
+  updateSelectionBar();
+}
+
+/* ---------- Overview ---------- */
+const selectedVerbs = () => VERBS.filter(v => state.selected.has(v.inf));
+
+function renderOverview() {
+  const words = selectedVerbs();
+  const today = todayISO();
+  const rows = words.map(v => `<div class="wrow"><div class="w"><b>${infHtml(v)}</b><small>${esc(v.uk)}</small></div>
+      <input type="date" class="draftdate" data-inf="${esc(v.inf)}" value="${esc(draft[v.inf] || '')}">
+      <button class="plain" data-action="remove-selected" data-inf="${esc(v.inf)}" title="Викинути">✕</button></div>`).join('');
+  app.innerHTML = `<div class="toolbar"><button class="plain" data-action="back">‹ Назад</button></div>
+    <h1>Твій вибір</h1><p class="sub">Слів: ${words.length}. Скажи, коли вчимо кожне, або дай мені розкидати їх самому.</p>
+    ${words.length ? `
+    <div class="card">
+      <div class="ctl"><label>Один день для всіх</label><input type="date" id="bulkDate" value="${today}"><button class="ghost" data-action="bulk-date">Ок, усім!</button></div>
+      <div class="ctl"><label>По</label><input type="number" id="perDay" min="1" value="5"><label>слів на день, від</label><input type="date" id="spreadStart" value="${today}"><button class="ghost" data-action="spread">Розкидай</button></div>
+    </div>
+    <div class="card">${rows}</div>
+    <div class="ctl"><button data-action="save-plan">У план 📅</button><button class="ghost" data-action="learn-now">Вчимо зараз 🚀</button></div>`
+    : '<div class="empty">Ти ще нічого не вибрав 👀<br>Повертайся й тицяй на слова.</div>'}`;
+}
+
+/* ---------- Plan tab ---------- */
+function renderPlanTab() {
+  const byDate = {};
+  for (const [inf, date] of Object.entries(state.schedule)) (byDate[date] ||= []).push(BY_INF.get(inf));
+  const dates = Object.keys(byDate).sort();
+  const today = todayISO();
+  const days = dates.map(date => {
+    const words = byDate[date].sort((a, b) => a.inf.localeCompare(b.inf, 'de'));
+    const tag = date < today ? '<span class="tag late">пропущено 🙈</span>' : date === today ? '<span class="tag">сьогодні 🔥</span>' : '';
+    return `<div class="card day"><div class="head"><h3>${esc(formatDate(date))}</h3>${tag}<span class="spacer"></span><span class="count">${words.length}</span>
+      <button data-action="start-day" data-date="${date}">Вчити!</button></div>
+      ${words.map(v => `<div class="wrow"><div class="w"><b>${infHtml(v)}</b><small>${esc(v.uk)}</small></div>
+        <input type="date" class="plandate" data-inf="${esc(v.inf)}" value="${date}">
+        <button class="plain" data-action="unschedule" data-inf="${esc(v.inf)}" title="Прибрати з плану">✕</button></div>`).join('')}</div>`;
+  }).join('');
+  app.innerHTML = `<h1>План</h1><p class="sub">Тут усе по днях. Пропустив день — не страшно, слова самі перескочать у «Сьогодні».</p>
+    ${days || '<div class="empty">План порожній 🫥<br>Обери слова на вкладці «Слова» й признач їм дати.</div>'}
+    ${dates.length ? '<p style="text-align:center"><button class="plain" data-action="reset-plan">Стерти весь план</button></p>' : ''}`;
+}
+
+/* ---------- Today tab ---------- */
+function renderTodayTab() {
+  const words = dueWords();
+  const today = todayISO();
+  const rows = words.map(v => {
+    const date = state.schedule[v.inf];
+    return `<div class="wrow"><div class="w"><b>${infHtml(v)}</b><small>${esc(v.uk)}${date < today ? ' · <span style="color:var(--red)">пропущено, ' + esc(formatDate(date)) + '</span>' : ''}</small></div></div>`;
+  }).join('');
+  app.innerHTML = `<h1>Сьогодні</h1><p class="sub">${esc(formatDate(today))}</p>
+    ${words.length ? `<div class="card">${rows}</div><button class="wide" data-action="start-today">Погнали (${words.length}) 🚀</button>`
+      : '<div class="empty">На сьогодні нічого немає 🎉<br>Відпочивай або вибери нові слова на вкладці «Слова».</div>'}`;
+}
+
+/* ---------- Done ---------- */
+function renderDone() {
+  app.innerHTML = `<div class="done"><div class="emoji">🏆</div><h1>Ти просто вогонь!</h1><p class="sub">Усі вправи пройдено. Слів: ${session.words.length}. Прибрав їх із плану — відпочинь 😎</p>
+    <button data-action="home">Ще раз? 💪</button></div>`;
+}
+
+/* ================= SESSION ================= */
+const STEPS = [
+  { title: 'Картки', applies: () => true, render: renderFlashcard },
+  { title: 'Обери форми', applies: () => true, render: renderChoice },
+  { title: 'Голосні', applies: v => blankSlots(v).length > 0, render: renderBlanks },
+  { title: 'Пиши німецькою', applies: () => true, render: renderTyping },
+];
+
+function startSession(words) {
+  session = { words, stepIndex: -1, queue: [], stepTotal: 0, stepDone: 0, onKey: null };
+  view = 'session';
+  tabbar.style.display = 'none';
+  nextStep();
+}
+
+function nextStep() {
+  session.stepIndex++;
+  if (session.stepIndex >= STEPS.length) { finishSession(); return; }
+  const step = STEPS[session.stepIndex];
+  session.queue = shuffle(session.words.filter(step.applies));
+  session.stepTotal = session.queue.length;
+  session.stepDone = 0;
+  if (!session.queue.length) { nextStep(); return; }
+  renderSessionShell();
+}
+
+function renderSessionShell() {
+  const step = STEPS[session.stepIndex];
+  const pct = session.stepTotal ? Math.round(session.stepDone / session.stepTotal * 100) : 0;
+  app.innerHTML = `<div class="sesshead"><button class="plain" data-action="quit-session">✕</button><div class="title">Крок ${session.stepIndex + 1} з ${STEPS.length} · ${step.title}</div><span class="count">${session.stepDone}/${session.stepTotal}</span></div>
+    <div class="progress"><i style="width:${pct}%"></i></div><div id="stage"></div>`;
+  session.onKey = null;
+  step.render(session.queue[0], document.getElementById('stage'));
+  window.scrollTo(0, 0);
+}
+
+// result: 'done' removes the word from this step; 'retry' sends it to the back (or a few cards ahead for flashcards).
+function answered(result, retryOffset) {
+  const word = session.queue.shift();
+  if (result === 'done') session.stepDone++;
+  else session.queue.splice(Math.min(retryOffset ?? session.queue.length, session.queue.length), 0, word);
+  if (!session.queue.length) nextStep(); else renderSessionShell();
+}
+
+function finishSession() {
+  for (const v of session.words) delete state.schedule[v.inf];
+  saveState();
+  view = 'done';
+  render();
+}
+
+/* Step 1: flashcards */
+function renderFlashcard(v, stage) {
+  stage.innerHTML = `<div class="flip" id="flip"><div class="flip-inner">
+      <div class="face front"><div class="big">${esc(v.inf)}</div><div class="uk">${esc(v.uk)}</div><div class="hint">Тицни, щоб перевернути · Пробіл</div></div>
+      <div class="face back"><div class="mid">${infHtml(v)}</div><div class="uk">${esc(v.uk)}</div>
+        <div class="forms"><div class="form-line"><small>Präteritum</small><div>${pretHtml(v)}</div></div>
+        <div class="form-line"><small>Partizip II</small><div>${ptzHtml(v)}</div></div></div></div></div></div>
+    <div class="grades" id="grades" style="visibility:hidden"><button class="again" data-grade="again">Ще раз 🤔 <small>1</small></button><button class="good" data-grade="good">Добре 👌 <small>2</small></button><button class="easy" data-grade="easy">Легко 😎 <small>3</small></button></div>`;
+  const flip = document.getElementById('flip');
+  const grades = document.getElementById('grades');
+  const toggle = () => { flip.classList.toggle('flipped'); grades.style.visibility = flip.classList.contains('flipped') ? 'visible' : 'hidden'; };
+  const grade = g => { if (flip.classList.contains('flipped')) g === 'again' ? answered('retry', 3) : answered('done'); };
+  flip.addEventListener('click', toggle);
+  grades.addEventListener('click', e => { const b = e.target.closest('[data-grade]'); if (b) grade(b.dataset.grade); });
+  session.onKey = e => {
+    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); }
+    else if (e.key === '1') grade('again'); else if (e.key === '2') grade('good'); else if (e.key === '3') grade('easy');
+  };
+}
+
+/* Shared "check, then continue" button behaviour for steps 2-4 */
+function checkThenContinue(button, check, focusFirst) {
+  let checked = false, correct = false;
+  const act = () => {
+    if (!checked) { correct = check(); checked = true; button.textContent = 'Далі →'; button.focus(); }
+    else answered(correct ? 'done' : 'retry');
+  };
+  button.addEventListener('click', act);
+  session.onKey = e => { if (e.key === 'Enter') { e.preventDefault(); act(); } };
+  if (focusFirst) focusFirst.focus();
+  return act;
+}
+
+/* Step 2: multiple choice */
+const VOWEL_POOL = ['a', 'e', 'i', 'o', 'u', 'ie', 'ei', 'au', 'ä', 'ö', 'ü'];
+const randomOther = text => { const options = VOWEL_POOL.filter(x => x !== text); return options[Math.floor(Math.random() * options.length)]; };
+
+function mutate(form, ranges, mutatedRangeSet) {
+  let out = form;
+  [...ranges].sort((a, b) => b.start - a.start).forEach(r => { if (mutatedRangeSet.has(r)) out = out.slice(0, r.start) + randomOther(r.text) + out.slice(r.end); });
+  return out;
+}
+
+function wrongPairs(v, count) {
+  const a = analyse(v);
+  const pret = a.primaryPret, ptz = a.primaryPtz;
+  const pretSlots = pret.ranges.length ? pret.ranges : pret.runs.slice(0, 1);
+  const ptzSlots = ptz.ranges.length ? ptz.ranges : ptz.runs.slice(0, 1);
+  const truth = `${pret.text}|${ptz.text}`;
+  const seen = new Set([truth]);
+  const wrong = [];
+  for (let attempt = 0; wrong.length < count && attempt < 200; attempt++) {
+    const mode = attempt % 3;
+    const p = mode !== 2 ? mutate(pret.text, pretSlots, new Set(pretSlots)) : pret.text;
+    const q = mode !== 1 ? mutate(ptz.text, ptzSlots, new Set(ptzSlots)) : ptz.text;
+    const key = `${p}|${q}`;
+    if (!seen.has(key)) { seen.add(key); wrong.push({ pret: p, ptz: q }); }
+  }
+  return wrong;
+}
+
+function renderChoice(v, stage) {
+  const a = analyse(v);
+  const truth = { pret: a.primaryPret.text, ptz: a.primaryPtz.text, right: true };
+  const options = shuffle([truth, ...wrongPairs(v, 3)]);
+  const label = o => `${esc(o.pret)} · ${esc(auxLabel(v))} ${esc(o.ptz)}`;
+  stage.innerHTML = `<div class="qcard"><div class="uk">Обери правильні Präteritum і Partizip II</div><div class="big">${esc(v.inf)}</div><div class="uk">${esc(v.uk)}</div></div>
+    <div class="opts">${options.map((o, i) => `<button class="opt" data-i="${i}">${label(o)}</button>`).join('')}</div>
+    <div class="feedback" id="fb"></div><button class="wide" id="next" style="display:none">Далі →</button>`;
+  const next = document.getElementById('next');
+  let picked = false;
+  stage.querySelector('.opts').addEventListener('click', e => {
+    const btn = e.target.closest('.opt');
+    if (!btn || picked) return;
+    picked = true;
+    const choice = options[Number(btn.dataset.i)];
+    stage.querySelectorAll('.opt').forEach((b, i) => { if (options[i].right) b.classList.add('ok'); });
+    if (!choice.right) btn.classList.add('bad');
+    const fb = document.getElementById('fb');
+    fb.className = 'feedback ' + (choice.right ? 'ok' : 'bad');
+    fb.textContent = choice.right ? 'Є! 🎯' : 'Мимо 🙈 Правильна відповідь підсвічена.';
+    next.style.display = '';
+    next.focus();
+    next.onclick = () => answered(choice.right ? 'done' : 'retry');
+    session.onKey = ev => { if (ev.key === 'Enter') { ev.preventDefault(); next.click(); } };
+  });
+  session.onKey = ev => { const n = Number(ev.key); if (n >= 1 && n <= 4) stage.querySelectorAll('.opt')[n - 1]?.click(); };
+}
+
+/* Step 3: fill in the changed vowels */
+function blankSlots(v) {
+  const a = analyse(v);
+  return [...a.primaryPret.ranges, ...a.primaryPtz.ranges];
+}
+
+function blanksLine(form, prefix) {
+  const ranges = [...form.ranges].sort((a, b) => a.start - b.start);
+  let html = esc(prefix), pos = 0;
+  for (const r of ranges) {
+    html += esc(form.text.slice(pos, r.start)) + `<input class="blank" type="text" style="width:${r.text.length + 1.6}ch" data-answer="${esc(r.text)}" maxlength="3" autocomplete="off" autocapitalize="off" spellcheck="false">`;
+    pos = r.end;
+  }
+  return html + esc(form.text.slice(pos));
+}
+
+function renderBlanks(v, stage) {
+  const a = analyse(v);
+  stage.innerHTML = `<div class="qcard"><div class="uk">Впиши голосні, які зникли 🕵️</div><div class="big">${esc(v.inf)}</div><div class="uk">${esc(v.uk)}</div>
+    <div class="forms"><div class="form-line"><small>Präteritum</small><div class="blankline">${blanksLine(a.primaryPret, '')}</div></div>
+    <div class="form-line"><small>Partizip II</small><div class="blankline">${blanksLine(a.primaryPtz, auxLabel(v) + ' ')}</div></div></div></div>
+    <div class="feedback" id="fb"></div><button class="wide" id="check">Перевірити</button>`;
+  const inputs = [...stage.querySelectorAll('input.blank')];
+  inputs.forEach((input, i) => input.addEventListener('input', () => { if (input.value.length >= input.dataset.answer.length && inputs[i + 1]) inputs[i + 1].focus(); }));
+  checkThenContinue(document.getElementById('check'), () => {
+    let allRight = true;
+    inputs.forEach(input => {
+      const right = normalise(input.value) === normalise(input.dataset.answer);
+      input.classList.add(right ? 'ok' : 'bad');
+      if (!right) { allRight = false; input.value = input.dataset.answer; }
+      input.readOnly = true;
+    });
+    const fb = document.getElementById('fb');
+    fb.className = 'feedback ' + (allRight ? 'ok' : 'bad');
+    fb.textContent = allRight ? 'Ідеально! ✨' : `Майже! Ось як треба: ${pretPlain(v)} · ${ptzPlain(v)}`;
+    return allRight;
+  }, inputs[0]);
+}
+
+/* Step 4: Ukrainian -> type the three forms */
+function checkTypedForms(v, answers) {
+  const aux = normalise(answers.ptz).match(/^(hat\/ist|hat|ist)\s+(.+)$/);
+  const auxOk = !!aux && (aux[1] === 'hat/ist' ? v.aux.length === 2 : v.aux.includes(aux[1]));
+  const ptzOk = auxOk && v.ptz.some(p => normalise(p) === aux[2]);
+  return {
+    inf: normalise(answers.inf) === normalise(v.inf),
+    pret: v.pret.some(p => normalise(p) === normalise(answers.pret)),
+    ptz: ptzOk,
+    missingAux: !aux,
+  };
+}
+
+function renderTyping(v, stage) {
+  stage.innerHTML = `<div class="qcard"><div class="uk">А як це німецькою?</div><div class="big">${esc(v.uk)}</div></div>
+    <div class="fields"><div class="keys">${['ä', 'ö', 'ü', 'ß'].map(k => `<button type="button" data-key="${k}">${k}</button>`).join('')}</div>
+      <div><label>Infinitiv</label><input class="t" id="f-inf" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"><div class="answer" id="a-inf"></div></div>
+      <div><label>Präteritum</label><input class="t" id="f-pret" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"><div class="answer" id="a-pret"></div></div>
+      <div><label>Partizip II (з hat / ist)</label><input class="t" id="f-ptz" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="напр. hat gemacht"><div class="answer" id="a-ptz"></div></div></div>
+    <div class="feedback" id="fb"></div><button class="wide" id="check">Перевірити</button>`;
+  const fields = { inf: stage.querySelector('#f-inf'), pret: stage.querySelector('#f-pret'), ptz: stage.querySelector('#f-ptz') };
+  let lastFocused = fields.inf;
+  Object.values(fields).forEach(f => f.addEventListener('focus', () => { lastFocused = f; }));
+  stage.querySelector('.keys').addEventListener('mousedown', e => {
+    const b = e.target.closest('[data-key]');
+    if (!b) return;
+    e.preventDefault();
+    lastFocused.value += b.dataset.key;
+    lastFocused.focus();
+  });
+  checkThenContinue(document.getElementById('check'), () => {
+    const result = checkTypedForms(v, { inf: fields.inf.value, pret: fields.pret.value, ptz: fields.ptz.value });
+    const correct = { inf: v.inf, pret: pretPlain(v), ptz: ptzPlain(v) };
+    for (const key of ['inf', 'pret', 'ptz']) {
+      fields[key].classList.add(result[key] ? 'ok' : 'bad');
+      fields[key].readOnly = true;
+      if (!result[key]) stage.querySelector('#a-' + key).textContent = 'Треба так: ' + correct[key];
+    }
+    const allRight = result.inf && result.pret && result.ptz;
+    const fb = document.getElementById('fb');
+    fb.className = 'feedback ' + (allRight ? 'ok' : 'bad');
+    fb.textContent = allRight ? 'Бездоганно! 🏆' : (result.missingAux ? 'Не забудь hat / ist перед Partizip II 😉' : 'Є помилки — це слово ще повернеться 😈');
+    return allRight;
+  }, fields.inf);
+  // Tab through fields with Enter before checking
+  Object.entries(fields).forEach(([key, input], i, all) => input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !input.readOnly && all[i + 1]) { e.preventDefault(); e.stopPropagation(); all[i + 1][1].focus(); }
+  }));
+}
+
+/* ---------- events ---------- */
+app.addEventListener('input', e => {
+  if (e.target.id === 'search') { search = e.target.value; renderWordList(); }
+});
+
+app.addEventListener('change', e => {
+  const t = e.target;
+  if (t.classList.contains('wordcheck')) {
+    t.checked ? state.selected.add(t.dataset.inf) : state.selected.delete(t.dataset.inf);
+    saveState(); updateSelectionBar();
+  } else if (t.classList.contains('draftdate')) {
+    draft[t.dataset.inf] = t.value;
+  } else if (t.classList.contains('plandate')) {
+    if (t.value) state.schedule[t.dataset.inf] = t.value;
+    saveState(); render();
+  }
+});
+
+function handleClick(e) {
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const a = el.dataset.action;
+  if (a === 'tab') { tab = el.dataset.tab; render(); }
+  else if (a === 'select-all') { filteredVerbs().forEach(v => state.selected.add(v.inf)); saveState(); renderWordList(); updateSelectionBar(); }
+  else if (a === 'select-none') { filteredVerbs().forEach(v => state.selected.delete(v.inf)); saveState(); renderWordList(); updateSelectionBar(); }
+  else if (a === 'open-overview') { draft = {}; selectedVerbs().forEach(v => { draft[v.inf] = state.schedule[v.inf] || ''; }); view = 'overview'; render(); }
+  else if (a === 'back') { view = 'main'; render(); }
+  else if (a === 'remove-selected') { state.selected.delete(el.dataset.inf); delete draft[el.dataset.inf]; saveState(); renderOverview(); }
+  else if (a === 'bulk-date') {
+    const date = document.getElementById('bulkDate').value;
+    if (date) { selectedVerbs().forEach(v => { draft[v.inf] = date; }); renderOverview(); }
+  }
+  else if (a === 'spread') {
+    const perDay = Math.max(1, parseInt(document.getElementById('perDay').value, 10) || 1);
+    const start = document.getElementById('spreadStart').value;
+    if (start) { selectedVerbs().forEach((v, i) => { draft[v.inf] = addDays(start, Math.floor(i / perDay)); }); renderOverview(); }
+  }
+  else if (a === 'save-plan') {
+    selectedVerbs().forEach(v => { draft[v.inf] ? state.schedule[v.inf] = draft[v.inf] : delete state.schedule[v.inf]; });
+    saveState(); view = 'main'; tab = 'plan'; render();
+  }
+  else if (a === 'learn-now') { startSession(shuffle(selectedVerbs())); }
+  else if (a === 'start-day') { const date = el.dataset.date; startSession(Object.keys(state.schedule).filter(i => state.schedule[i] === date).map(i => BY_INF.get(i))); }
+  else if (a === 'start-today') { startSession(dueWords()); }
+  else if (a === 'unschedule') { delete state.schedule[el.dataset.inf]; saveState(); render(); }
+  else if (a === 'reset-plan') { if (confirm('Точно стерти весь план? 😳')) { state.schedule = {}; saveState(); render(); } }
+  else if (a === 'quit-session') { if (confirm('Вийти? Прогрес цього заняття згорить 🔥')) { view = 'main'; session = null; render(); } }
+  else if (a === 'home') { view = 'main'; tab = 'words'; render(); }
+}
+app.addEventListener('click', handleClick);
+tabbar.addEventListener('click', handleClick);
+
+document.addEventListener('keydown', e => {
+  if (view === 'session' && session && session.onKey) {
+    if (e.target.tagName === 'INPUT' && e.key !== 'Enter') return;
+    session.onKey(e);
+  }
+});
+
+window.IV = { VERBS, analyse, checkTypedForms, wrongPairs, normalise };
+render();
+})();
+</script>
+</body>
+</html>
